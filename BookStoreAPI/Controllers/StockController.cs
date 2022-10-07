@@ -24,7 +24,25 @@ namespace BookStoreAPI.Controllers
         public async Task<IActionResult> GetStock()
         {
             var stocklist = await _stockService.GetStockAsync();
+            if(stocklist == null)
+            {
+                return BadRequest("Empty Stock");
+            }
             return Ok(_mapper.Map<List<StockModelApi>>(stocklist));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStockById([FromRoute] int id)
+        {
+            var stockInfo = await _stockService.GetStockByIdAsync(id);
+            if (stockInfo == null)
+            {
+                return BadRequest("Invalid Book Id");
+            }
+            else
+            {
+                return Ok(_mapper.Map<StockModelApi>(stockInfo));
+            }
         }
     }
 }

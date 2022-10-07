@@ -20,5 +20,11 @@ namespace Business.Logic.Layer.Services
             var stocklist = await _stockRepository.GetStockAsync();
             return _mapper.Map<List<StockModelBusiness>>(stocklist);
         }
+
+        public async Task<StockModelBusiness> GetStockByIdAsync( int bookId)
+        {
+            var bookStock = await _stockRepository.GetStockByIdAsync(bookId);
+            return _mapper.Map<StockModelBusiness>(bookStock);
+        }
     }
 }

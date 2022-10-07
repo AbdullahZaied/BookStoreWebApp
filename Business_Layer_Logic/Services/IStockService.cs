@@ -6,5 +6,6 @@ namespace Business.Logic.Layer.Services
     public interface IStockService
     {
         Task<List<StockModelBusiness>> GetStockAsync();
+        Task<StockModelBusiness> GetStockByIdAsync(int bookId);
     }
 }
