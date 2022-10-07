@@ -1,5 +1,4 @@
 ﻿using Business.Logic.Layer.Models;
-using Data.Access.Layer.Data;
 
 namespace Business.Logic.Layer.Services
 {
@@ -7,5 +6,6 @@ namespace Business.Logic.Layer.Services
     {
         Task<List<StockModelBusiness>> GetStockAsync();
         Task<StockModelBusiness> GetStockByIdAsync(int bookId);
+        Task<int?> SetStockByIdAsync(StockModelBusiness stock);
     }
 }

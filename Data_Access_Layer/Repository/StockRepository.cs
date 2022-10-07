@@ -28,5 +28,20 @@ namespace Data.Access.Layer.Repository
                                     .FirstOrDefaultAsync();
             return bookStock;
         }
+
+        public async Task<int?> SetStockByIdAsync(Stock stockInfo)
+        {
+            var bookStock = await _dbContext.Stocks
+                                    .FirstOrDefaultAsync(x => x.BookId == stockInfo.BookId);
+            if (bookStock != null)
+            {
+                bookStock.StockedBy = stockInfo.StockedBy;
+                bookStock.StockedAt = stockInfo.StockedAt;
+                bookStock.StockAmount = stockInfo.StockAmount;
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return bookStock?.BookId;
+        }
     }
 }

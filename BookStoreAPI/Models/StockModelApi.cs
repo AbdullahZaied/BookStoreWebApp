@@ -8,7 +8,7 @@
         public int IncStockBy { get; set; }
         public int DecStockBy { get; set; }
         public DateTime StockedAt { get; set; }
-        public string StockedBy { get; set; }
+        public string? StockedBy { get; set; }
 
     }
 }

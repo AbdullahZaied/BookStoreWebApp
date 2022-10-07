@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BookStoreAPI.Models;
+using Business.Logic.Layer.Models;
 using Business.Logic.Layer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,20 @@ namespace BookStoreAPI.Controllers
             else
             {
                 return Ok(_mapper.Map<StockModelApi>(stockInfo));
+            }
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> SetStockById([FromBody] StockModelApi stock)
+        {
+            var bookId = await _stockService.SetStockByIdAsync(_mapper.Map<StockModelBusiness>(stock));
+            if (bookId == null)
+            {
+                return BadRequest("Invalid Book Id");
+            }
+            else
+            {
+                return CreatedAtAction(nameof(GetStockById), new { id = bookId, controller = "Stock" }, bookId); ;
             }
         }
     }

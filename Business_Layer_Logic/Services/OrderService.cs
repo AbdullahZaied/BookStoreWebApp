@@ -2,7 +2,6 @@
 using Business.Logic.Layer.Models;
 using Data.Access.Layer.Models;
 using Data.Access.Layer.Repository;
-using Microsoft.AspNetCore.Http;
 
 namespace Business.Logic.Layer.Services
 {

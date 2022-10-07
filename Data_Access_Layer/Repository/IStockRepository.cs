@@ -6,5 +6,6 @@ namespace Data.Access.Layer.Repository
     {
         Task<List<Stock>> GetStockAsync();
         Task<Stock?> GetStockByIdAsync(int bookId);
+        Task<int?> SetStockByIdAsync(Stock stockInfo);
     }
 }
