@@ -44,5 +44,16 @@ namespace Business.Logic.Layer.Services
                 return -1;
             }
         }
+
+        public async Task<OrderModelBusiness> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var oderBusiness = _mapper.Map<OrderModelBusiness>(order);
+            if(oderBusiness == null || (oderBusiness.UserId != _accountService.GetCurrentUserId()))
+            {
+                return null;
+            }
+            return oderBusiness;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Data.Access.Layer.Models;
+﻿using Data.Access.Layer.Data;
+using Data.Access.Layer.Models;
 
 namespace Data.Access.Layer.Repository
 {
@@ -7,5 +8,6 @@ namespace Data.Access.Layer.Repository
         Task<int> GetBookAmountByIdAsync(int bookId);
         Task SetBookAmountByIdAsync(int bookId, int newAmount);
         Task<int> OrderBookByIdAsync(OrderModelData order);
+        Task<Order> GetOrderByIdAsync(int orderId);
     }
 }

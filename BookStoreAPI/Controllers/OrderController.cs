@@ -36,5 +36,19 @@ namespace BookStoreAPI.Controllers
                 return Ok(orderStatus);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderById([FromRoute] int id)
+        {
+            var order = _mapper.Map<OrderModelApi>(await _orderService.GetOrderByIdAsync(id));
+            if(order == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
     }
 }

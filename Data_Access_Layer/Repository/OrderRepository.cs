@@ -32,6 +32,14 @@ namespace Data.Access.Layer.Repository
             }
         }
 
+        public async Task<Order> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _dbContext.Orders
+                                    .Where(x => x.Id == orderId)
+                                    .FirstOrDefaultAsync();
+            return order;
+        }
+
         public async Task<int> OrderBookByIdAsync(OrderModelData order)
         {
             var newOrder = new Order()

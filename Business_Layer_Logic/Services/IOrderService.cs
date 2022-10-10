@@ -5,5 +5,6 @@ namespace Business.Logic.Layer.Services
     public interface IOrderService
     {
         Task<int> OrderBookById(OrderModelBusiness order);
+        Task<OrderModelBusiness> GetOrderByIdAsync(int orderId);
     }
 }
