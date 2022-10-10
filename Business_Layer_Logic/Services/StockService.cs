@@ -2,6 +2,8 @@
 using Business.Logic.Layer.Models;
 using Data.Access.Layer.Data;
 using Data.Access.Layer.Repository;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Business.Logic.Layer.Services
 {
@@ -36,8 +38,39 @@ namespace Business.Logic.Layer.Services
         {
             stock.StockedBy = _accountService.GetCurrentUserId();
             stock.StockedAt = DateTime.Now;
-            var newStock = await _stockRepository.SetStockByIdAsync(_mapper.Map<Stock>(stock));
-            return newStock;
+            var id = await _stockRepository.SetStockByIdAsync(_mapper.Map<Stock>(stock));
+            return id;
+        }
+
+        public async Task<int?> DecreaseStockByIdAsync(StockModelBusiness stock)
+        {   
+            var bookStock = await _stockRepository.GetStockByIdAsync(stock.BookId);
+            if(bookStock.StockAmount - stock.DecStockBy < 0)
+            {
+                return null;
+            }
+            else
+            {
+                stock.StockAmount = bookStock.StockAmount - stock.DecStockBy;
+                var id = await SetStockByIdAsync(stock);
+                return id;
+            }
+
+        }
+        public async Task<int?> IncreaseStockByIdAsync(StockModelBusiness stock)
+        {
+            var bookStock = await _stockRepository.GetStockByIdAsync(stock.BookId);
+            
+            if(bookStock == null)
+            {
+                return null;
+            }
+            else
+            {
+                stock.StockAmount = bookStock.StockAmount + stock.IncStockBy;
+                var id = await SetStockByIdAsync(stock);
+                return id;
+            }
         }
     }
 }
