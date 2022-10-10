@@ -40,6 +40,14 @@ namespace Data.Access.Layer.Repository
             return order;
         }
 
+        public async Task<int?> DeleteOrderByIdAsync(int orderId)
+        {
+            var order = await _dbContext.Orders.Where(x => x.Id == orderId).FirstOrDefaultAsync();
+            _dbContext.Orders.Remove(order);
+            await _dbContext.SaveChangesAsync();
+            return order.Id;
+        }
+
         public async Task<int> OrderBookByIdAsync(OrderModelData order)
         {
             var newOrder = new Order()

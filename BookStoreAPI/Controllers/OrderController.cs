@@ -50,5 +50,20 @@ namespace BookStoreAPI.Controllers
                 return Ok(order);
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrderById([FromRoute] int id)
+        {
+            var deleted = await _orderService.DeleteOrderByIdAsync(id);
+
+            if (deleted != null)
+            {
+                return Ok(deleted);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }
