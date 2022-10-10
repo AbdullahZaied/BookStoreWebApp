@@ -63,5 +63,12 @@ namespace Data.Access.Layer.Repository
 
             return newOrder.Id;
         }
+
+        public async Task<List<Order>> GetAllOrdersOfUserAsync(string userId)
+        {
+            var orders = await _dbContext.Orders.Where(x => x.UserId == userId).ToListAsync();
+
+            return orders;
+        }
     }
 }

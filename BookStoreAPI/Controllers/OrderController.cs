@@ -37,6 +37,14 @@ namespace BookStoreAPI.Controllers
             }
         }
 
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllOrdersOfUser()
+        {
+            var orders = await _orderService.GetAllOrdersOfUserAsync();
+            var orderList = _mapper.Map<List<OrderModelApi>>(orders);
+            return Ok(orderList);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderById([FromRoute] int id)
         {

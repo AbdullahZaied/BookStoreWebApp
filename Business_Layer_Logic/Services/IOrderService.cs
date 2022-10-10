@@ -7,5 +7,6 @@ namespace Business.Logic.Layer.Services
         Task<int> OrderBookById(OrderModelBusiness order);
         Task<OrderModelBusiness> GetOrderByIdAsync(int orderId);
         Task<int?> DeleteOrderByIdAsync(int orderId);
+        Task<List<OrderModelBusiness>> GetAllOrdersOfUserAsync();
     }
 }

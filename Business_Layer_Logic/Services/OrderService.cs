@@ -78,5 +78,18 @@ namespace Business.Logic.Layer.Services
             }
 
         }
+
+        public async Task<List<OrderModelBusiness>> GetAllOrdersOfUserAsync()
+        {
+            var userId = _accountService.GetCurrentUserId();
+
+            if(userId == null)
+            {
+                return null;
+            }
+            var orders = _orderRepository.GetAllOrdersOfUserAsync(userId);
+            var ordersList = _mapper.Map<List<OrderModelBusiness>>(orders);
+            return ordersList;
+        }
     }
 }

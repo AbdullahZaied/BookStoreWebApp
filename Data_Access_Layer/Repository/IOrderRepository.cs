@@ -10,5 +10,6 @@ namespace Data.Access.Layer.Repository
         Task<int> OrderBookByIdAsync(OrderModelData order);
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<int?> DeleteOrderByIdAsync(int orderId);
+        Task<List<Order>> GetAllOrdersOfUserAsync(string userId);
     }
 }
