@@ -9,12 +9,17 @@ namespace Business.Logic.Layer.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IAccountService _accountService;
+        private readonly IStockService _stockService;
         private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository orderRepository, IAccountService accountService, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository,
+            IAccountService accountService,
+            IStockService stockService,
+            IMapper mapper)
         {
             _orderRepository = orderRepository;
             _accountService = accountService;
+            _stockService = stockService;
             _mapper = mapper;
         }
 
@@ -43,6 +48,48 @@ namespace Business.Logic.Layer.Services
             {
                 return -1;
             }
+        }
+
+        public async Task<OrderModelBusiness> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var oderBusiness = _mapper.Map<OrderModelBusiness>(order);
+            if(oderBusiness == null || (oderBusiness.UserId != _accountService.GetCurrentUserId()))
+            {
+                return null;
+            }
+            return oderBusiness;
+        }
+
+        public async Task<int?> DeleteOrderByIdAsync(int orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var stock = await _stockService.GetStockByIdAsync(order.BookId);
+            var oderBusiness = _mapper.Map<OrderModelBusiness>(order);
+            if (oderBusiness == null || (oderBusiness.UserId != _accountService.GetCurrentUserId()))
+            {
+                return null;
+            }
+            else
+            {
+                await _orderRepository.SetBookAmountByIdAsync(order.BookId, order.OrderAmount + stock.StockAmount);
+                var deleted = await _orderRepository.DeleteOrderByIdAsync(orderId);
+                return deleted;
+            }
+
+        }
+
+        public async Task<List<OrderModelBusiness>> GetAllOrdersOfUserAsync()
+        {
+            var userId = _accountService.GetCurrentUserId();
+
+            if(userId == null)
+            {
+                return null;
+            }
+            var orders = _orderRepository.GetAllOrdersOfUserAsync(userId);
+            var ordersList = _mapper.Map<List<OrderModelBusiness>>(orders);
+            return ordersList;
         }
     }
 }

@@ -36,5 +36,42 @@ namespace BookStoreAPI.Controllers
                 return Ok(orderStatus);
             }
         }
+
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllOrdersOfUser()
+        {
+            var orders = await _orderService.GetAllOrdersOfUserAsync();
+            var orderList = _mapper.Map<List<OrderModelApi>>(orders);
+            return Ok(orderList);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrderById([FromRoute] int id)
+        {
+            var order = _mapper.Map<OrderModelApi>(await _orderService.GetOrderByIdAsync(id));
+            if(order == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(order);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrderById([FromRoute] int id)
+        {
+            var deleted = await _orderService.DeleteOrderByIdAsync(id);
+
+            if (deleted != null)
+            {
+                return Ok(deleted);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

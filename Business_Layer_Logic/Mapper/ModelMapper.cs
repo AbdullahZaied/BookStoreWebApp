@@ -14,6 +14,7 @@ namespace Business.Logic.Layer.Mapper
             CreateMap<SignUpModelBusiness, SignUpModelData>().ReverseMap();
             CreateMap<OrderModelBusiness, OrderModelData>().ReverseMap();
             CreateMap<StockModelBusiness, Stock>().ReverseMap();
+            CreateMap<OrderModelBusiness, Order>().ReverseMap();
         }
     }
 }

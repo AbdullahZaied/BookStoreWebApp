@@ -32,6 +32,22 @@ namespace Data.Access.Layer.Repository
             }
         }
 
+        public async Task<Order> GetOrderByIdAsync(int orderId)
+        {
+            var order = await _dbContext.Orders
+                                    .Where(x => x.Id == orderId)
+                                    .FirstOrDefaultAsync();
+            return order;
+        }
+
+        public async Task<int?> DeleteOrderByIdAsync(int orderId)
+        {
+            var order = await _dbContext.Orders.Where(x => x.Id == orderId).FirstOrDefaultAsync();
+            _dbContext.Orders.Remove(order);
+            await _dbContext.SaveChangesAsync();
+            return order.Id;
+        }
+
         public async Task<int> OrderBookByIdAsync(OrderModelData order)
         {
             var newOrder = new Order()
@@ -46,6 +62,13 @@ namespace Data.Access.Layer.Repository
             await _dbContext.SaveChangesAsync();
 
             return newOrder.Id;
+        }
+
+        public async Task<List<Order>> GetAllOrdersOfUserAsync(string userId)
+        {
+            var orders = await _dbContext.Orders.Where(x => x.UserId == userId).ToListAsync();
+
+            return orders;
         }
     }
 }
