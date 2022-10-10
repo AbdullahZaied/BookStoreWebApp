@@ -46,9 +46,10 @@ namespace BookStoreAPI.Controllers
             }
         }
 
-        [HttpPost("")]
-        public async Task<IActionResult> SetStockById([FromBody] StockModelApi stock)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> SetStockById([FromRoute] int id, [FromBody] StockModelApi stock)
         {
+            stock.BookId = id;
             var bookId = await _stockService.SetStockByIdAsync(_mapper.Map<StockModelBusiness>(stock));
             if (bookId == null)
             {
@@ -56,7 +57,51 @@ namespace BookStoreAPI.Controllers
             }
             else
             {
+                return Ok(bookId);
+            }
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> CreateStock([FromBody] StockModelApi stock)
+        {
+            var bookId = await _stockService.CreateStockAsync(_mapper.Map<StockModelBusiness>(stock));
+            if (bookId == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
                 return CreatedAtAction(nameof(GetStockById), new { id = bookId, controller = "Stock" }, bookId); ;
+            }
+        }
+
+        [HttpPut("increase/{id}")]
+        public async Task<IActionResult> IncreaseStockById([FromRoute] int id, [FromBody] StockModelApi stock)
+        {
+            stock.BookId = id;
+            var bookId = await _stockService.IncreaseStockByIdAsync(_mapper.Map<StockModelBusiness>(stock));
+            if (bookId == null)
+            {
+                return BadRequest("Invalid Book Id");
+            }
+            else
+            {
+                return Ok(bookId);
+            }
+        }
+
+        [HttpPut("decrease/{id}")]
+        public async Task<IActionResult> DecreaseStockById([FromRoute] int id, [FromBody] StockModelApi stock)
+        {
+            stock.BookId = id;
+            var bookId = await _stockService.DecreaseStockByIdAsync(_mapper.Map<StockModelBusiness>(stock));
+            if (bookId == null)
+            {
+                return BadRequest("Invalid Book Id");
+            }
+            else
+            {
+                return Ok(bookId);
             }
         }
     }

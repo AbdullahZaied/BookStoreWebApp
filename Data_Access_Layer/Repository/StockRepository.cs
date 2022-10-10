@@ -43,5 +43,21 @@ namespace Data.Access.Layer.Repository
 
             return bookStock?.BookId;
         }
+
+        public async Task<int?> CreateStockAsync(Stock stockInfo)
+        {
+            var newStock = new Stock()
+            {
+                BookId = stockInfo.BookId,
+                StockAmount = stockInfo.StockAmount,
+                StockedBy = stockInfo.StockedBy,
+                StockedAt = stockInfo.StockedAt
+            };
+
+            _dbContext.Stocks.Add(newStock);
+            await _dbContext.SaveChangesAsync();
+
+            return newStock.BookId;
+        }
     }
 }
