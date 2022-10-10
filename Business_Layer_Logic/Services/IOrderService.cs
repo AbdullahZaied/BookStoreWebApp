@@ -8,5 +8,6 @@ namespace Business.Logic.Layer.Services
         Task<OrderModelBusiness> GetOrderByIdAsync(int orderId);
         Task<int?> DeleteOrderByIdAsync(int orderId);
         Task<List<OrderModelBusiness>> GetAllOrdersOfUserAsync();
+        Task<int?> UpdateOrderByIdAsync(int orderId, OrderModelBusiness order);
     }
 }

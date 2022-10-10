@@ -1,6 +1,7 @@
 ﻿using Data.Access.Layer.Data;
 using Data.Access.Layer.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Data.Access.Layer.Repository
 {
@@ -22,14 +23,16 @@ namespace Data.Access.Layer.Repository
             return amount;
         }
 
-        public async Task SetBookAmountByIdAsync(int bookId, int newAmount)
+        public async Task<int?> SetBookAmountByIdAsync(int bookId, int newAmount)
         {
             var bookStock = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.BookId == bookId);
             if (bookStock != null)
             {
                 bookStock.StockAmount = newAmount;
-                await _dbContext.SaveChangesAsync();
+                var result = await _dbContext.SaveChangesAsync();
+                return result;
             }
+            return null;
         }
 
         public async Task<Order> GetOrderByIdAsync(int orderId)
@@ -69,6 +72,16 @@ namespace Data.Access.Layer.Repository
             var orders = await _dbContext.Orders.Where(x => x.UserId == userId).ToListAsync();
 
             return orders;
+        }
+
+        public async Task<int> UpdateOrderByIdAsync(Order order)
+        {
+            var orderFromEntity = await _dbContext.Orders.FindAsync(order.Id);
+            
+            orderFromEntity.BookId = order.BookId;
+            orderFromEntity.OrderAmount = order.OrderAmount;
+            orderFromEntity.UpdatedAt = order.UpdatedAt;
+            return await _dbContext.SaveChangesAsync();
         }
     }
 }
