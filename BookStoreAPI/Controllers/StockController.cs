@@ -46,9 +46,10 @@ namespace BookStoreAPI.Controllers
             }
         }
 
-        [HttpPut("")]
-        public async Task<IActionResult> SetStockById([FromBody] StockModelApi stock)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> SetStockById([FromRoute] int id, [FromBody] StockModelApi stock)
         {
+            stock.BookId = id;
             var bookId = await _stockService.SetStockByIdAsync(_mapper.Map<StockModelBusiness>(stock));
             if (bookId == null)
             {
@@ -60,6 +61,19 @@ namespace BookStoreAPI.Controllers
             }
         }
 
+        [HttpPost("")]
+        public async Task<IActionResult> CreateStock([FromBody] StockModelApi stock)
+        {
+            var bookId = await _stockService.CreateStockAsync(_mapper.Map<StockModelBusiness>(stock));
+            if (bookId == null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return CreatedAtAction(nameof(GetStockById), new { id = bookId, controller = "Stock" }, bookId); ;
+            }
+        }
 
         [HttpPut("increase/{id}")]
         public async Task<IActionResult> IncreaseStockById([FromRoute] int id, [FromBody] StockModelApi stock)
@@ -87,7 +101,7 @@ namespace BookStoreAPI.Controllers
             }
             else
             {
-                return CreatedAtAction(nameof(GetStockById), new { id = bookId, controller = "Stock" }, bookId); ;
+                return Ok(bookId);
             }
         }
     }

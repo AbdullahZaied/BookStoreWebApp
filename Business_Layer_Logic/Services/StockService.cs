@@ -42,6 +42,19 @@ namespace Business.Logic.Layer.Services
             return id;
         }
 
+        public async Task<int?> CreateStockAsync(StockModelBusiness stock)
+        {
+            var bookStock = await _stockRepository.GetStockByIdAsync(stock.BookId);
+            if(bookStock != null)
+            {
+                return null;
+            }
+            stock.StockedBy = _accountService.GetCurrentUserId();
+            stock.StockedAt = DateTime.Now;
+            var id = await _stockRepository.CreateStockAsync(_mapper.Map<Stock>(stock));
+            return id;
+        }
+
         public async Task<int?> DecreaseStockByIdAsync(StockModelBusiness stock)
         {   
             var bookStock = await _stockRepository.GetStockByIdAsync(stock.BookId);

@@ -7,6 +7,7 @@ namespace Business.Logic.Layer.Services
         Task<List<StockModelBusiness>> GetStockAsync();
         Task<StockModelBusiness> GetStockByIdAsync(int bookId);
         Task<int?> SetStockByIdAsync(StockModelBusiness stock);
+        Task<int?> CreateStockAsync(StockModelBusiness stock);
         Task<int?> DecreaseStockByIdAsync(StockModelBusiness stock);
         Task<int?> IncreaseStockByIdAsync(StockModelBusiness stock);
     }
