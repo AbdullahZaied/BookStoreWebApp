@@ -73,5 +73,21 @@ namespace BookStoreAPI.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOrderById([FromRoute] int id, [FromBody] OrderModelApi order)
+        {
+            var orderBusiness = _mapper.Map<OrderModelBusiness>(order);
+            var updated = await _orderService.UpdateOrderByIdAsync(id, orderBusiness);
+
+            if (updated != null)
+            {
+                return Ok(updated);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
     }
 }

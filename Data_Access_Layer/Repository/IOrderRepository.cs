@@ -11,5 +11,7 @@ namespace Data.Access.Layer.Repository
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<int?> DeleteOrderByIdAsync(int orderId);
         Task<List<Order>> GetAllOrdersOfUserAsync(string userId);
+        Task<int> UpdateOrderByIdAsync(Order order);
+        Task<int> SaveChangesAsync();
     }
 }

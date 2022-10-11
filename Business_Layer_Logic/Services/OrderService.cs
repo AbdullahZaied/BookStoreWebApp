@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Business.Logic.Layer.Models;
+using Data.Access.Layer.Data;
 using Data.Access.Layer.Models;
 using Data.Access.Layer.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Business.Logic.Layer.Services
 {
@@ -25,29 +27,30 @@ namespace Business.Logic.Layer.Services
 
         public async Task<int> OrderBookById(OrderModelBusiness order)
         {
-            int stockAmount = await _orderRepository.GetBookAmountByIdAsync(order.BookId);
             order.CreatedAt = DateTime.Now;
             order.UserId = _accountService.GetCurrentUserId();
-
-            if (stockAmount >= order.OrderAmount)
+            int stockAmount = await _orderRepository.GetBookAmountByIdAsync(order.BookId);
+            try
             {
-                try
+                if (stockAmount >= order.OrderAmount)
                 {
                     var newAmount = stockAmount - order.OrderAmount;
                     await _orderRepository.SetBookAmountByIdAsync(order.BookId, newAmount);
-                    var id = await _orderRepository.OrderBookByIdAsync(_mapper.Map<OrderModelData>(order));
-
-                    return id;
-                }
-                catch(Exception ex)
-                { 
-                    throw new ArgumentException(ex.Message);
+                    var success = await _orderRepository.SaveChangesAsync();
+                    if(success != 0)
+                    {
+                        var id = await _orderRepository.OrderBookByIdAsync(_mapper.Map<OrderModelData>(order));
+                        return id;
+                    }
+                    return -1;
                 }
             }
-            else
+            catch (DbUpdateConcurrencyException ex)
             {
-                return -1;
+                throw ex;
             }
+
+            return -1;
         }
 
         public async Task<OrderModelBusiness> GetOrderByIdAsync(int orderId)
@@ -73,8 +76,56 @@ namespace Business.Logic.Layer.Services
             else
             {
                 await _orderRepository.SetBookAmountByIdAsync(order.BookId, order.OrderAmount + stock.StockAmount);
+                await _orderRepository.SaveChangesAsync();
                 var deleted = await _orderRepository.DeleteOrderByIdAsync(orderId);
                 return deleted;
+            }
+
+        }
+
+        private async Task<string> BackToStock(int orderId)
+        {
+            var currentOrder = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (currentOrder == null || (currentOrder.UserId != _accountService.GetCurrentUserId()))
+            {
+                return null;
+            }
+            var stockOfCurrentOrderedBook = await _stockService.GetStockByIdAsync(currentOrder.BookId);
+            var newAmount = stockOfCurrentOrderedBook.StockAmount + currentOrder.OrderAmount;
+            await _orderRepository.SetBookAmountByIdAsync(currentOrder.BookId, newAmount);
+            var done = await _orderRepository.SaveChangesAsync();
+
+            return done == 1? "ok" : null;
+        }
+
+        public async Task<int?> UpdateOrderByIdAsync(int orderId, OrderModelBusiness order)
+        {
+            var proceed = await BackToStock(orderId);
+            var orderData = _mapper.Map<Order>(order);
+
+            if (proceed == null)
+            {
+                return null;
+            }
+            else
+            {
+                var stock = await _stockService.GetStockByIdAsync(order.BookId);
+             
+                orderData.UpdatedAt = DateTime.Now;
+                orderData.UserId = _accountService.GetCurrentUserId();
+                orderData.Id = orderId;
+                
+                if(order.OrderAmount > stock.StockAmount)
+                {
+                    return null;
+                }
+
+                var newBookAmount = stock.StockAmount - order.OrderAmount;
+                await _orderRepository.SetBookAmountByIdAsync(order.BookId, newBookAmount);
+                await _orderRepository.SaveChangesAsync();
+                var updated = await _orderRepository.UpdateOrderByIdAsync(orderData);
+                
+                return updated;
             }
 
         }
@@ -87,7 +138,7 @@ namespace Business.Logic.Layer.Services
             {
                 return null;
             }
-            var orders = _orderRepository.GetAllOrdersOfUserAsync(userId);
+            var orders = await _orderRepository.GetAllOrdersOfUserAsync(userId);
             var ordersList = _mapper.Map<List<OrderModelBusiness>>(orders);
             return ordersList;
         }
