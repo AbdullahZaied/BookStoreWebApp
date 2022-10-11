@@ -25,16 +25,14 @@ namespace Data.Access.Layer.Repository
             return amount;
         }
 
-        public async Task<int?> SetBookAmountByIdAsync(int bookId, int newAmount)
+        public async Task SetBookAmountByIdAsync(int bookId, int newAmount)
         {
             var bookStock = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.BookId == bookId);
+            bookStock.StockAmount = newAmount;
             if (bookStock != null)
             {
-                bookStock.StockAmount = newAmount;
-                var result = await _dbContext.SaveChangesAsync();
-                return result;
+                _dbContext.Update(bookStock);
             }
-            return null;
         }
 
         public async Task<Order> GetOrderByIdAsync(int orderId)
@@ -84,6 +82,54 @@ namespace Data.Access.Layer.Repository
             orderFromEntity.OrderAmount = order.OrderAmount;
             orderFromEntity.UpdatedAt = order.UpdatedAt;
             return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            int success = 0;
+            IDbContextTransaction tx = null;
+
+            try
+            {
+                using (tx = await _dbContext.Database.BeginTransactionAsync())
+                {
+                    success = await _dbContext.SaveChangesAsync();
+                    tx.Commit();
+                    return success;
+                }
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.Entity is Stock)
+                    {
+                        var proposedValues = entry.CurrentValues;
+                        var databaseValues = entry.GetDatabaseValues();
+
+                        foreach (var property in proposedValues.Properties)
+                        {
+                            var proposedValue = proposedValues[property];
+                            var databaseValue = databaseValues[property];
+                        }
+
+                        // Refresh original values to bypass next concurrency check
+                        entry.OriginalValues.SetValues(databaseValues);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Unable to save changes. The stock was updated by another user. " + entry.Metadata.Name);
+                    }
+                }
+                throw ex;
+            }
+            catch (DbUpdateException ex)
+            {
+                SqlException s = ex.InnerException as SqlException;
+                var errorMessage = $"{ex.Message}" + " {ex?.InnerException.Message}" + " rolling back…";
+                tx.Rollback();
+            }
+            return success;
         }
     }
 }
