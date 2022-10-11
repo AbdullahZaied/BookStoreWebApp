@@ -1,6 +1,8 @@
 ﻿using Data.Access.Layer.Data;
 using Data.Access.Layer.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Net;
 
 namespace Data.Access.Layer.Repository
