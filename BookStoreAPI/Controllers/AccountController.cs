@@ -2,7 +2,12 @@
 using BookStoreAPI.Models;
 using Business.Logic.Layer.Models;
 using Business.Logic.Layer.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookStoreAPI.Controllers
 {
@@ -56,6 +61,20 @@ namespace BookStoreAPI.Controllers
             }
 
             return Ok(signinResult);
+        }
+
+        [HttpGet("logout")]
+        public async Task LogoutAsync()
+        {
+            try
+            {
+                await _accountService.LogoutAsync();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

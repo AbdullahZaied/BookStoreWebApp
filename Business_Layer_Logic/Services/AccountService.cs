@@ -48,5 +48,10 @@ namespace Business.Logic.Layer.Services
             var signinResult = await _accountRepository.LoginAsync(_mapper.Map<SignInModelData>(signInModel));
             return signinResult;
         }
+
+        public async Task LogoutAsync()
+        {
+            await _accountRepository.LogoutAsync();
+        }
     }
 }

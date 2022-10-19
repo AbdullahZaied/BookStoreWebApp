@@ -9,5 +9,6 @@ namespace Data.Access.Layer.Repository
         Task<IdentityResult> SignUpAsync(SignUpModelData signUpModel);
         Task<string> LoginAsync(SignInModelData signInModel);
         Task<string> RefreshToken(string? currentAccessToken);
+        Task LogoutAsync();
     }
 }

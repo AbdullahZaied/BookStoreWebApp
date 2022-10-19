@@ -1,9 +1,11 @@
 using Business.Logic.Layer.Services;
 using Data.Access.Layer.Data;
 using Data.Access.Layer.Repository;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -27,19 +29,19 @@ builder.Services.AddSwaggerGen(option =>
         Scheme = "Bearer"
     });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
         {
-            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            new string[]{}
-        }
-    });
+                    Reference = new OpenApiReference
+                    {
+                        Type=ReferenceType.SecurityScheme,
+                        Id="Bearer"
+                    }
+                },
+                new string[]{}
+            }
+        });
 });
 
 builder.Services.AddDbContext<BookStoreContext>(options => options.UseSqlServer(
@@ -49,12 +51,14 @@ builder.Services.AddDbContext<BookStoreContext>(options => options.UseSqlServer(
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<BookStoreContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+})
+    .AddJwtBearer(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
@@ -69,7 +73,14 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:ValidAudience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
+})
+    .AddGoogle(options =>
+{
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 });
+
+
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
@@ -94,6 +105,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

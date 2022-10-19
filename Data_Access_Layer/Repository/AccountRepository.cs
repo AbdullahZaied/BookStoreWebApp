@@ -165,5 +165,10 @@ namespace Data.Access.Layer.Repository
 
             return jwtToken;
         }
+
+        public async Task LogoutAsync()
+        {
+            await signInManager.SignOutAsync();
+        }
     }
 }

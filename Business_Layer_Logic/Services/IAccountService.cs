@@ -8,5 +8,6 @@ namespace Business.Logic.Layer.Services
         Task<bool> signUp(SignUpModelBusiness signUpModel);
         string? GetCurrentUserId();
         Task<string> RefreshToken();
+        Task LogoutAsync();
     }
 }
